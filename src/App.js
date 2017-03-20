@@ -2,41 +2,29 @@ import React, { Component } from 'react';
 import './App.css';
 
 
-class SettingBox extends Component {
-  constructor(props) {
-    super(props);
-    this.handleChange = this.handleChange.bind(this);
-  }
-
-  handleChange(e) {
-    this.props.onSettingChange(e.target.value);
-  }
-
-  render() {
-    const setting = this.props.setting;
-    const value = this.props.value;
-    return (
-      <tr>
-        <td><legend>{setting}</legend></td>
-        <td><input value={value}
-            onChange={this.handleChange} /></td>
-      </tr>
-    );
-  }
+function SettingBox(props) {
+  return (
+    <div>
+      <legend>{props.settingName}</legend>
+      <input name={props.settingName}
+          value={props.value}
+          onChange={props.onChange} />
+    </div>
+  );
 }
 
-class SessionSettingsBox extends Component {
-  render() {
-    return (
-      <tr>
-        <td><SettingBox setting="draw time" value="30" /></td>
-        <td><SettingBox setting="session time" value="5" /></td>
-        <td><SettingBox setting="images" value="10" /></td>
-      </tr>
+function SessionSettingsBox(props) {
+    const settings = props.settings.map((setting) =>
+      <li key={setting["settingName"]}>
+      <SettingBox settingName={setting["settingName"]} value={setting["value"]} onChange={setting["onChange"]} />
+      </li>
     );
-  }
+  return (
+    <ul>
+      {settings}
+    </ul>
+  );
 }
-
 
 class ImageDisplayBox extends Component {
   render() {
@@ -48,6 +36,7 @@ class ImageDisplayBox extends Component {
 
 function previous () {
     alert("previous");
+
 }
 
 function pause () {
@@ -133,7 +122,7 @@ class ImageSelectionBox extends Component {
         <ImageBox image={number} />
       </li>
     );
-    this.state = {images: images}
+    this.state = {images: images};
   }
 
   render() {
@@ -145,12 +134,57 @@ class ImageSelectionBox extends Component {
   }
 }
 
+function calcNumberOfImages(drawTime,session) {
+  return (session*60/drawTime)
+}
+function calcSessionTime(drawTime,images) {
+  let sessionTimeSeconds = drawTime*images;
+  let sessionTime = sessionTimeSeconds/60;
+  if (sessionTimeSeconds%60) { sessionTime++ }
+  return (sessionTime)
+}
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+          drawTime:30,
+          session:5,
+          images:10,
+    };
+    this.drawTimeChange = this.drawTimeChange.bind(this);
+    this.sessionTimeChange = this.sessionTimeChange.bind(this);
+    this.numberOfImagesChange = this.numberOfImagesChange.bind(this);
+  }
+
+  drawTimeChange(event) {
+    const drawTime = event.target.value;
+    const images = calcNumberOfImages(drawTime, this.state.session);
+    this.setState({drawTime:drawTime, images:images});
+  }
+  sessionTimeChange(event) {
+    const session = event.target.value;
+    const images = calcNumberOfImages(this.state.drawTime, session);
+    this.setState({session:session, images:images});
+  }
+  numberOfImagesChange(event) {
+    const images = event.target.value;
+    const session = calcSessionTime(this.state.drawTime, images);
+    console.log({session:session, images:images});
+    this.setState({session:session, images:images});
+    console.log({session:session, images:images});
+  }
+
   render() {
     return (
       <div className="App">
-        <SessionSettingsBox />
+        <SessionSettingsBox
+              settings={[
+                {"settingName":"draw time (sec)", "value":this.state.drawTime, "onChange":this.drawTimeChange},
+                {"settingName":"session (min)", "value":this.state.session, "onChange":this.sessionTimeChange},
+                {"settingName":"images", "value":this.state.images, "onChange":this.numberOfImagesChange},
+              ]}
+        />
         <ImageDisplayBox />
         <PlaybackControlBox />
         <SearchBox />
