@@ -3,9 +3,9 @@ import './App.css';
 
 function SettingBox(props) {
   return (
-    <div>
-      <legend>{props.settingName}</legend>
-      <input name={props.settingName}
+    <div className="setting-box">
+      <legend className="setting-box">{props.settingName}</legend>
+      <input className="setting-box" name={props.settingName}
           value={props.value}
           onChange={props.onChange} />
     </div>
@@ -14,23 +14,15 @@ function SettingBox(props) {
 
 function SessionSettingsBox(props) {
     const settings = props.settings.map((setting) =>
-      <li key={setting["settingName"]}>
+      <li className="setting-box" key={setting["settingName"]}>
       <SettingBox settingName={setting["settingName"]} value={setting["value"]} onChange={setting["onChange"]} />
       </li>
     );
   return (
-    <ul>
+    <ul className="session-settings-box">
       {settings}
     </ul>
   );
-}
-
-class ImageDisplayBox extends Component {
-  render() {
-    return (
-      <div>images go here</div>
-    )
-  }
 }
 
 function previous () {
@@ -53,7 +45,7 @@ function skip () {
 class PlaybackControlBox extends Component {
   render() {
     return (
-      <div>
+      <div className="playback-control-box">
         <button onClick={previous}>
           previous
         </button>
@@ -67,6 +59,14 @@ class PlaybackControlBox extends Component {
           skip
         </button>
       </div>
+    )
+  }
+}
+
+class ImageDisplayBox extends Component {
+  render() {
+    return (
+      <div className="image-display-box">images go here</div>
     )
   }
 }
@@ -109,7 +109,7 @@ class SearchBox extends Component {
   searchImages(event,searchTerm) {
     event.preventDefault();
     httpGetAsync(
-       'https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=6c76a6758b1e9f0cd9f22e74ea6a50ee&text='+searchTerm+'&format=json&extras=url_n,url_c&nojsoncallback=1',
+       'https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=6c76a6758b1e9f0cd9f22e74ea6a50ee&text='+searchTerm+'&format=json&extras=url_q,url_c&nojsoncallback=1',
           this.props.imageCallback);
   }
 
@@ -129,7 +129,9 @@ class SearchBox extends Component {
 class ImageBox extends Component {
   render() {
     return (
-      <img src={this.props.image} alt={this.props.alt} />
+      <div className="image-box">
+        <img className="image-box" src={this.props.image} alt={this.props.alt} />
+      </div>
     )
   }
 }
@@ -137,7 +139,7 @@ class ImageBox extends Component {
 class ImageSelectionBox extends Component {
   render() {
     return (
-      <ul>
+      <ul className="image-selection-box">
         {this.props.images}
       </ul>
     )
@@ -193,9 +195,7 @@ class App extends Component {
     console.log(json);
 
     const images = json.photos.photo.slice(0,30).map((photo) =>
-      <li key={photo.id}>
-        <ImageBox id={photo.id} image={photo.url_n} alt={photo.title} />
-      </li>
+        <ImageBox id={photo.id} image={photo.url_q} alt={photo.title} />
     );
 
     this.setState({images:images});

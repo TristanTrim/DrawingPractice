@@ -1,0 +1,42 @@
+
+body {
+  text-align: center;
+  background-color: #666;
+}
+
+.setting-box {
+  display: inline;
+  color: #ddd;
+  padding: 2px;
+  margin: 3px;
+}
+input.setting-box {
+  color: #222;
+  width:8em;
+}
+
+.session-settings-box {
+  position: fixed;
+  top: -1em;
+  left: 0;
+  width: 100%;
+  padding: .6em;
+  background-color: #222;
+}
+
+.image-display-box {
+  margin-top: 4em;
+}
+
+.image-box {
+  display: inline;
+}
+img.image-box {
+  padding: 1em;
+}
+
+.image-selection-box {
+  width: 80%;
+}
+
+
