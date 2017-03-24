@@ -1,3 +1,18 @@
+Flickr Api Key:
+ Done! Here's the API key and secret for your new app:
+  Drawing practice
+
+Key:
+6c76a6758b1e9f0cd9f22e74ea6a50ee
+
+Secret:
+7ab2c09572b0631d 
+
+
+Flickr only has photos. It's pretty good, but I'd like to be able to study other peoples art as well. So bing or something would be nicer, but flickr is good for now.
+
+It returns non integer numbers of images! This is wrong.
+
 
 
 This is cool:
@@ -30,20 +45,37 @@ I like duck duck:
 https://duckduckgo.com/?q=Search term
 
 
-Well, this is what I'm using:
-https://duckduckgo.com/i.js?q=fashion%20photography&o=json&p=s&s=100&u=yahoo&l=wt-wt&vqd=222604589494944989924733977658927445915
-Sorry ddg, but you're a sloot and you make me feel so good.
-
-
 Possible sources for images:
 Has api:
-https://developers.shutterstock.com/
-https://services.tineye.com/TinEyeAPI
+
 https://www.flickr.com/services/api/
-https://www.splashbase.co/api
-https://www.pexels.com/api/
+Not more than 30 images per page... I don't know if that's ok.
+Ok, it's flickr! I'll try to limit images per page in some way, I think that's just a formality for not using too much bandwidth.
+The licensing doesn't look that bad once I've read more into it. I like:
+"This product uses the Flickr API but is not endorsed or certified by Flickr."
+
+https://developers.shutterstock.com/
+Hos "shutterstock" watermarked on pictures.
+A think it has to be shutterstock, assuming their request policy is in any way better than flicrs.
+It's not.
+
 https://pixabay.com/api/docs/
+Kinda bad.
+I *really* like thier lisensing speal, but there's not enough images.
+
 http://developers.gettyimages.com/en/
+good.
+I like the resources availiable, but can't find documentation of rate limits.
+Legal mumbo jumbo looks bad.
+Had some nice images, but only 2 for wolfsbane.
+
+https://services.tineye.com/TinEyeAPI
+Not the kind of image search I want. Seems exclusively reverse image.
+
+https://www.splashbase.co/api
+Bad.
+https://www.pexels.com/api/
+bad.
 
 Maybe api:
 http://photopin.com/faq
