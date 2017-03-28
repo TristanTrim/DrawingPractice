@@ -28,15 +28,30 @@ input.setting-box {
   margin-top: 4em;
 }
 
-.image-box {
-  display: inline;
+.search-box {
+  background-color: #bbb;
+  width: 80%;
+  margin: auto;
+  padding-top: .6em;
+  padding-bottom: .6em;
 }
-img.image-box {
-  padding: 1em;
+
+.image-box {
+  display: inline-block;
+  width: 200px;
+  height: 200px;
+  font-size: 0;
+  vertical-align: middle;
+}
+.image-box-image {
+  vertical-align: middle;
+  margin: auto;
 }
 
 .image-selection-box {
+  background-color: #bbb;
   width: 80%;
+  margin: auto;
 }
 
 

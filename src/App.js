@@ -109,15 +109,15 @@ class SearchBox extends Component {
   searchImages(event,searchTerm) {
     event.preventDefault();
     httpGetAsync(
-       'https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=6c76a6758b1e9f0cd9f22e74ea6a50ee&text='+searchTerm+'&format=json&extras=url_q,url_c&nojsoncallback=1',
+       'https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=6c76a6758b1e9f0cd9f22e74ea6a50ee&sort=relevance&text='+searchTerm+'&format=json&extras=url_q,url_c&nojsoncallback=1',
           this.props.imageCallback);
   }
 
   render() {
     return (
-      <form>
+      <form className="search-box">
         <label>
-          <input type="text" value={this.state.value} onChange={this.handleChange} />
+          <input type="text" autoFocus="autofocus" value={this.state.value} onChange={this.handleChange} />
         </label>
         <input type="submit" value="Search" onClick={(e)=>this.searchImages(e,this.state.value)} />
         <input type="submit" value="Draw" onClick={this.startDrawing} />
@@ -130,7 +130,7 @@ class ImageBox extends Component {
   render() {
     return (
       <div className="image-box">
-        <img className="image-box" src={this.props.image} alt={this.props.alt} />
+        <img className="image-box-image" src={this.props.image} alt={this.props.alt} />
       </div>
     )
   }
@@ -139,9 +139,9 @@ class ImageBox extends Component {
 class ImageSelectionBox extends Component {
   render() {
     return (
-      <ul className="image-selection-box">
+      <div className="image-selection-box">
         {this.props.images}
-      </ul>
+      </div>
     )
   }
 }
