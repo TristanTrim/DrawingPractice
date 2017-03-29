@@ -146,22 +146,45 @@ class ImageSelectionBox extends Component {
   }
 }
 
+// calculations for session time & images
 function calcNumberOfImages(drawTime,session) {
-  return (session*60/drawTime)
+  return (timeToSeconds(session)/timeToSeconds(drawTime));
 }
 function calcSessionTime(drawTime,numberOfImages) {
-  let sessionTimeSeconds = drawTime*numberOfImages;
-  let sessionTime = sessionTimeSeconds/60;
-  if (sessionTimeSeconds%60) { sessionTime++ }
-  return (sessionTime)
+  let sessionTimeSeconds = timeToSeconds(drawTime)*numberOfImages;
+  return secondsToTime(sessionTimeSeconds);
+}
+
+// tools for time input field
+function timeToSeconds(time) {
+  return(time.hours*3600+time.minutes*60+time.seconds);
+}
+function secondsToTime(seconds) {
+  return({hours:seconds/3600,minutes:seconds%3600/60,seconds:seconds%3600%60});
+}
+function parseTime(timeString) {
+  timeString = timeString.replace(/:/g,"");
+  var seconds = parseInt(timeString.slice(-2, timeString.length));
+  var minutes = parseInt(timeString.slice(-4, -2));
+  var hours = parseInt(timeString.slice(0, -4));
+  seconds = isNaN(seconds) ? 0 : seconds;
+  minutes = isNaN(minutes) ? 0 : minutes;
+  hours = isNaN(hours) ? 0 : hours;
+  return({hours:hours,minutes:minutes,seconds:seconds});
+}
+function renderTime(time) {
+  var hours = time.hours;
+  var minutes = time.minutes >= 10 ? time.minutes : "0"+time.minutes;
+  var seconds = time.seconds >= 10 ? time.seconds : "0"+time.seconds;
+  return hours+":"+minutes+":"+seconds;
 }
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-          drawTime:30,
-          session:5,
+          drawTime:{hours:0,minutes:0,seconds:30},
+          session:{hours:0,minutes:5,seconds:0},
           numberOfImages:10,
           images:[],
     };
@@ -174,14 +197,16 @@ class App extends Component {
   updateImages(json) {
   }
   drawTimeChange(event) {
-    const drawTime = event.target.value;
+    const drawTimeString = event.target.value;
+    const drawTime = parseTime(drawTimeString);
     const numberOfImages = calcNumberOfImages(drawTime, this.state.session);
     this.setState({drawTime:drawTime, numberOfImages:numberOfImages});
   }
   sessionTimeChange(event) {
-    const session = event.target.value;
-    const numberOfImages = calcNumberOfImages(this.state.drawTime, session);
-    this.setState({session:session, numberOfImages:numberOfImages});
+    const sessionTimeString = event.target.value;
+    const sessionTime = parseTime(sessionTimeString);
+    const numberOfImages = calcNumberOfImages(this.state.drawTime, sessionTime);
+    this.setState({session:sessionTime, numberOfImages:numberOfImages});
   }
   numberOfImagesChange(event) {
     const numberOfImages = event.target.value;
@@ -206,8 +231,8 @@ class App extends Component {
       <div className="App">
         <SessionSettingsBox
               settings={[
-                {"settingName":"draw time (sec)", "value":this.state.drawTime, "onChange":this.drawTimeChange},
-                {"settingName":"session (min)", "value":this.state.session, "onChange":this.sessionTimeChange},
+                {"settingName":"draw time (sec)", "value":renderTime(this.state.drawTime), "onChange":this.drawTimeChange},
+                {"settingName":"session (min)", "value":renderTime(this.state.session), "onChange":this.sessionTimeChange},
                 {"settingName":"images", "value":this.state.numberOfImages, "onChange":this.numberOfImagesChange},
               ]}
         />
