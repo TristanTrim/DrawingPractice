@@ -126,16 +126,6 @@ class SearchBox extends Component {
   }
 }
 
-class ImageBox extends Component {
-  render() {
-    return (
-      <div className="image-box">
-        <img className="image-box-image" src={this.props.image} alt={this.props.alt} />
-      </div>
-    )
-  }
-}
-
 class ImageSelectionBox extends Component {
   render() {
     return (
@@ -179,6 +169,13 @@ function renderTime(time) {
   return hours+":"+minutes+":"+seconds;
 }
 
+function unFubarCursor(target) {
+    let cursorPosition = target.selectionEnd;
+    if (target.value.length == 6) { cursorPosition++; }
+    if (target.value.length == 8) { cursorPosition--; }
+    //const target = event.target;
+    return function() {target.setSelectionRange(cursorPosition,cursorPosition);};
+}
 class App extends Component {
   constructor(props) {
     super(props);
@@ -200,13 +197,19 @@ class App extends Component {
     const drawTimeString = event.target.value;
     const drawTime = parseTime(drawTimeString);
     const numberOfImages = calcNumberOfImages(drawTime, this.state.session);
-    this.setState({drawTime:drawTime, numberOfImages:numberOfImages});
+
+    const unFubarCursorCallback = unFubarCursor(event.target);
+    this.setState({drawTime:drawTime, numberOfImages:numberOfImages},
+                  unFubarCursorCallback);
   }
   sessionTimeChange(event) {
     const sessionTimeString = event.target.value;
     const sessionTime = parseTime(sessionTimeString);
     const numberOfImages = calcNumberOfImages(this.state.drawTime, sessionTime);
-    this.setState({session:sessionTime, numberOfImages:numberOfImages});
+
+    const unFubarCursorCallback = unFubarCursor(event.target);
+    this.setState({session:sessionTime, numberOfImages:numberOfImages}, 
+                  unFubarCursorCallback);
   }
   numberOfImagesChange(event) {
     const numberOfImages = event.target.value;
@@ -217,16 +220,18 @@ class App extends Component {
   }
   imageCallback(responseString) {
     const json = eval("("+responseString+")");
-    console.log(json);
 
-    const images = json.photos.photo.slice(0,30).map((photo) =>
-        <ImageBox id={photo.id} image={photo.url_q} alt={photo.title} />
-    );
+    const images = json.photos.photo;
 
     this.setState({images:images});
   }
 
   render() {
+    const imageSelections = this.state.images.slice(0,30).map((photo) =>
+      <div key={photo.id} className="image-box">
+        <img className="image-box-image" src={photo.url_q} alt={photo.title} />
+      </div>
+    );
     return (
       <div className="App">
         <SessionSettingsBox
@@ -239,7 +244,7 @@ class App extends Component {
         <ImageDisplayBox />
         <PlaybackControlBox />
         <SearchBox imageCallback={this.imageCallback} />
-        <ImageSelectionBox images={this.state.images} />
+        <ImageSelectionBox images={imageSelections} />
       </div>
     );
   }

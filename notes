@@ -13,6 +13,7 @@ Flickr only has photos. It's pretty good, but I'd like to be able to study other
 
 It returns non integer numbers of images! This is wrong.
 
+It seems I need to be capturing the keys a user presses before they alter the state of the time in the time fields...
 
 
 This is cool:
