@@ -12,14 +12,14 @@ function SettingBox(props) {
   );
 }
 
-function SessionSettingsBox(props) {
+function SettingsBox(props) {
     const settings = props.settings.map((setting) =>
       <li className="setting-box" key={setting["settingName"]}>
       <SettingBox settingName={setting["settingName"]} value={setting["value"]} onChange={setting["onChange"]} />
       </li>
     );
   return (
-    <ul className="session-settings-box">
+    <ul className={props.className}>
       {settings}
     </ul>
   );
@@ -63,12 +63,13 @@ class PlaybackControlBox extends Component {
   }
 }
 
-class ImageDisplayBox extends Component {
-  render() {
-    return (
-      <div className="image-display-box">images go here</div>
-    )
-  }
+function ImageDisplayBox(props) {
+  const setBG = {
+    backgroundImage: 'url(' + props.imageUrl + ')',
+  };
+  return (
+    <div className="image-display-box" style={setBG} />
+  )
 }
 
 function httpGetAsync(theUrl, callback)
@@ -89,6 +90,7 @@ class SearchBox extends Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.startDrawing = this.startDrawing.bind(this);
   }
 
   handleChange(event) {
@@ -102,8 +104,8 @@ class SearchBox extends Component {
     event.preventDefault();
   }
   startDrawing(event) {
-    alert("Drawing will begin!");
     event.preventDefault();
+    this.props.start();
   }
 
   searchImages(event,searchTerm) {
@@ -168,7 +170,6 @@ function renderTime(time) {
   var seconds = time.seconds >= 10 ? time.seconds : "0"+time.seconds;
   return hours+":"+minutes+":"+seconds;
 }
-
 function unFubarCursor(target) {
     let cursorPosition = target.selectionEnd;
     if (target.value.length == 6) { cursorPosition++; }
@@ -176,6 +177,8 @@ function unFubarCursor(target) {
     //const target = event.target;
     return function() {target.setSelectionRange(cursorPosition,cursorPosition);};
 }
+
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -184,15 +187,16 @@ class App extends Component {
           session:{hours:0,minutes:5,seconds:0},
           numberOfImages:10,
           images:[],
+          currentImageNumber:0,
     };
     this.drawTimeChange = this.drawTimeChange.bind(this);
     this.sessionTimeChange = this.sessionTimeChange.bind(this);
     this.numberOfImagesChange = this.numberOfImagesChange.bind(this);
     this.imageCallback = this.imageCallback.bind(this);
+    this.start = this.start.bind(this);
+    this.getImageUrl = this.getImageUrl.bind(this);
   }
 
-  updateImages(json) {
-  }
   drawTimeChange(event) {
     const drawTimeString = event.target.value;
     const drawTime = parseTime(drawTimeString);
@@ -226,24 +230,49 @@ class App extends Component {
     this.setState({images:images});
   }
 
+  start(event) {
+    const newCurrentImageNumber = this.state.currentImageNumber+1;
+    console.log(newCurrentImageNumber);
+    console.log(this.state.images[newCurrentImageNumber]);
+    this.setState({currentImageNumber:newCurrentImageNumber});
+  }
+
+  getImageUrl(imageNumber) {
+    const image = this.state.images[imageNumber];
+    const farmId = image.farm;
+    const serverId = image.server;
+    const id = image.id;
+    const secret = image.secret;
+    return "https://farm"+farmId+".staticflickr.com/"+serverId+"/"+id+"_"+secret+".jpg";
+  }
+
   render() {
     const imageSelections = this.state.images.slice(0,30).map((photo) =>
       <div key={photo.id} className="image-box">
         <img className="image-box-image" src={photo.url_q} alt={photo.title} />
       </div>
     );
+    const imageUrl = this.state.images.length==0 ? "" : this.getImageUrl(this.state.currentImageNumber);
+    const settings = [
+                {"settingName":"draw time", "value":renderTime(this.state.drawTime), "onChange":this.drawTimeChange},
+                {"settingName":"session", "value":renderTime(this.state.session), "onChange":this.sessionTimeChange},
+                {"settingName":"images", "value":this.state.numberOfImages, "onChange":this.numberOfImagesChange},
+    ];
     return (
       <div className="App">
-        <SessionSettingsBox
-              settings={[
-                {"settingName":"draw time (sec)", "value":renderTime(this.state.drawTime), "onChange":this.drawTimeChange},
-                {"settingName":"session (min)", "value":renderTime(this.state.session), "onChange":this.sessionTimeChange},
-                {"settingName":"images", "value":this.state.numberOfImages, "onChange":this.numberOfImagesChange},
-              ]}
+        <SettingsBox
+              className="settings-box-real"
+              settings={settings}
         />
-        <ImageDisplayBox />
-        <PlaybackControlBox />
-        <SearchBox imageCallback={this.imageCallback} />
+        <div className="display-box">
+          <SettingsBox
+                className="settings-box-fake"
+                settings={settings}
+          />
+          <ImageDisplayBox imageUrl={imageUrl} />
+          <PlaybackControlBox />
+        </div>
+        <SearchBox imageCallback={this.imageCallback} start={this.start} />
         <ImageSelectionBox images={imageSelections} />
       </div>
     );

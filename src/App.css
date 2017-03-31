@@ -5,7 +5,7 @@ body {
 }
 
 .setting-box {
-  display: inline;
+  display: inline-block;
   color: #ddd;
   padding: 2px;
   margin: 3px;
@@ -15,19 +15,47 @@ input.setting-box {
   width:8em;
 }
 
-.session-settings-box {
+.settings-box-real {
   position: fixed;
+  display:flex;
+  justify-content:center;
   top: -1em;
   left: 0;
   width: 100%;
   padding: .6em;
   background-color: #222;
 }
-
-.image-display-box {
-  margin-top: 4em;
+.settings-box-fake{
+  display:flex;
+  justify-content:center;
+  width: 100%;
+  padding: .6em;
+  padding-top: .1em;
+  padding-bottom: .1em;
+  margin-left:0;
+  margin-bottom:0;
+  background-color: #222;
 }
 
+.display-box {
+  display:flex;
+  flex-direction:column;
+  height: 99vh;
+  width: 100vw;
+}
+
+.image-display-box {
+  height:100%;
+  flex-grow:1;
+  background-size:contain;
+  background-repeat:no-repeat;
+  background-position:center;
+}
+
+.playback-control-box {
+  float:left;
+  width:100%;
+}
 .search-box {
   background-color: #bbb;
   width: 80%;
