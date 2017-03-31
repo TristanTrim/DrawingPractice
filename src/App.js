@@ -34,33 +34,27 @@ function pause () {
     alert("pause");
 }
 
-function stop () {
-    alert("stop");
-}
-
 function skip () {
     alert("skip");
 }
 
-class PlaybackControlBox extends Component {
-  render() {
-    return (
-      <div className="playback-control-box">
-        <button onClick={previous}>
-          previous
-        </button>
-        <button onClick={pause}>
-          pause
-        </button>
-        <button onClick={stop}>
-          stop
-        </button>
-        <button onClick={skip}>
-          skip
-        </button>
-      </div>
-    )
-  }
+function PlaybackControlBox(props) {
+  return (
+    <div className="playback-control-box">
+      <button onClick={previous}>
+        previous
+      </button>
+      <button onClick={pause}>
+        pause
+      </button>
+      <button onClick={props.stop}>
+        stop
+      </button>
+      <button onClick={skip}>
+        skip
+      </button>
+    </div>
+  )
 }
 
 function ImageDisplayBox(props) {
@@ -186,6 +180,8 @@ class App extends Component {
           drawTime:{hours:0,minutes:0,seconds:30},
           session:{hours:0,minutes:5,seconds:0},
           numberOfImages:10,
+          //mode will be stop, play, or pause
+          mode:"stop",
           images:[],
           currentImageNumber:0,
     };
@@ -194,6 +190,7 @@ class App extends Component {
     this.numberOfImagesChange = this.numberOfImagesChange.bind(this);
     this.imageCallback = this.imageCallback.bind(this);
     this.start = this.start.bind(this);
+    this.stop = this.stop.bind(this);
     this.getImageUrl = this.getImageUrl.bind(this);
   }
 
@@ -234,7 +231,12 @@ class App extends Component {
     const newCurrentImageNumber = this.state.currentImageNumber+1;
     console.log(newCurrentImageNumber);
     console.log(this.state.images[newCurrentImageNumber]);
-    this.setState({currentImageNumber:newCurrentImageNumber});
+    this.setState({
+          currentImageNumber:newCurrentImageNumber,
+          mode:"play"});
+  }
+  stop(event) {
+    this.setState({mode:"stop"});
   }
 
   getImageUrl(imageNumber) {
@@ -258,20 +260,28 @@ class App extends Component {
                 {"settingName":"session", "value":renderTime(this.state.session), "onChange":this.sessionTimeChange},
                 {"settingName":"images", "value":this.state.numberOfImages, "onChange":this.numberOfImagesChange},
     ];
-    return (
-      <div className="App">
+    const maybeDisplayBox = this.state.mode=="stop" ?
         <SettingsBox
-              className="settings-box-real"
+              className="settings-box-fake"
               settings={settings}
         />
+      :
         <div className="display-box">
           <SettingsBox
                 className="settings-box-fake"
                 settings={settings}
           />
           <ImageDisplayBox imageUrl={imageUrl} />
-          <PlaybackControlBox />
+          <PlaybackControlBox stop={this.stop} />
         </div>
+    ;
+    return (
+      <div className="App">
+        <SettingsBox
+              className="settings-box-real"
+              settings={settings}
+        />
+        {maybeDisplayBox}
         <SearchBox imageCallback={this.imageCallback} start={this.start} />
         <ImageSelectionBox images={imageSelections} />
       </div>
