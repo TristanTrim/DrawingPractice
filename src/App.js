@@ -83,7 +83,6 @@ class SearchBox extends Component {
     this.state = {value: ''};
 
     this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
     this.startDrawing = this.startDrawing.bind(this);
   }
 
@@ -91,12 +90,6 @@ class SearchBox extends Component {
     this.setState({value: event.target.value});
   }
 
-  handleSubmit(event) {
-    console.log(event);
-    alert(event.target.value);
-    //this.searchImages(this.state.value);
-    event.preventDefault();
-  }
   startDrawing(event) {
     event.preventDefault();
     this.props.start();
@@ -133,8 +126,8 @@ class ImageSelectionBox extends Component {
 }
 
 // calculations for session time & images
-function calcNumberOfImages(drawTime,session) {
-  return (timeToSeconds(session)/timeToSeconds(drawTime));
+function calcNumberOfImages(drawTime,sessionTime) {
+  return (timeToSeconds(sessionTime)/timeToSeconds(drawTime));
 }
 function calcSessionTime(drawTime,numberOfImages) {
   let sessionTimeSeconds = timeToSeconds(drawTime)*numberOfImages;
@@ -146,13 +139,13 @@ function timeToSeconds(time) {
   return(time.hours*3600+time.minutes*60+time.seconds);
 }
 function secondsToTime(seconds) {
-  return({hours:seconds/3600,minutes:seconds%3600/60,seconds:seconds%3600%60});
+  return({hours:parseInt(seconds/3600, 10),minutes:parseInt(seconds%3600/60, 10),seconds:seconds%3600%60});
 }
 function parseTime(timeString) {
   timeString = timeString.replace(/:/g,"");
-  var seconds = parseInt(timeString.slice(-2, timeString.length));
-  var minutes = parseInt(timeString.slice(-4, -2));
-  var hours = parseInt(timeString.slice(0, -4));
+  var seconds = parseInt(timeString.slice(-2, timeString.length), 10);
+  var minutes = parseInt(timeString.slice(-4, -2), 10);
+  var hours = parseInt(timeString.slice(0, -4), 10);
   seconds = isNaN(seconds) ? 0 : seconds;
   minutes = isNaN(minutes) ? 0 : minutes;
   hours = isNaN(hours) ? 0 : hours;
@@ -166,8 +159,8 @@ function renderTime(time) {
 }
 function unFubarCursor(target) {
     let cursorPosition = target.selectionEnd;
-    if (target.value.length == 6) { cursorPosition++; }
-    if (target.value.length == 8) { cursorPosition--; }
+    if (target.value.length === 6) { cursorPosition++; }
+    if (target.value.length === 8) { cursorPosition--; }
     //const target = event.target;
     return function() {target.setSelectionRange(cursorPosition,cursorPosition);};
 }
@@ -178,7 +171,7 @@ class App extends Component {
     super(props);
     this.state = {
           drawTime:{hours:0,minutes:0,seconds:30},
-          session:{hours:0,minutes:5,seconds:0},
+          sessionTime:{hours:0,minutes:5,seconds:0},
           numberOfImages:10,
           //mode will be stop, play, or pause
           mode:"stop",
@@ -190,6 +183,7 @@ class App extends Component {
     this.numberOfImagesChange = this.numberOfImagesChange.bind(this);
     this.imageCallback = this.imageCallback.bind(this);
     this.start = this.start.bind(this);
+    this.countdown = this.countdown.bind(this);
     this.stop = this.stop.bind(this);
     this.getImageUrl = this.getImageUrl.bind(this);
   }
@@ -197,7 +191,7 @@ class App extends Component {
   drawTimeChange(event) {
     const drawTimeString = event.target.value;
     const drawTime = parseTime(drawTimeString);
-    const numberOfImages = calcNumberOfImages(drawTime, this.state.session);
+    const numberOfImages = calcNumberOfImages(drawTime, this.state.sessionTime);
 
     const unFubarCursorCallback = unFubarCursor(event.target);
     this.setState({drawTime:drawTime, numberOfImages:numberOfImages},
@@ -209,15 +203,13 @@ class App extends Component {
     const numberOfImages = calcNumberOfImages(this.state.drawTime, sessionTime);
 
     const unFubarCursorCallback = unFubarCursor(event.target);
-    this.setState({session:sessionTime, numberOfImages:numberOfImages}, 
+    this.setState({sessionTime:sessionTime, numberOfImages:numberOfImages}, 
                   unFubarCursorCallback);
   }
   numberOfImagesChange(event) {
     const numberOfImages = event.target.value;
-    const session = calcSessionTime(this.state.drawTime, numberOfImages);
-    console.log({session:session, numberOfImages:numberOfImages});
-    this.setState({session:session, numberOfImages:numberOfImages});
-    console.log({session:session, numberOfImages:numberOfImages});
+    const sessionTime = calcSessionTime(this.state.drawTime, numberOfImages);
+    this.setState({sessionTime:sessionTime, numberOfImages:numberOfImages});
   }
   imageCallback(responseString) {
     const json = eval("("+responseString+")");
@@ -229,13 +221,28 @@ class App extends Component {
 
   start(event) {
     const newCurrentImageNumber = this.state.currentImageNumber+1;
-    console.log(newCurrentImageNumber);
-    console.log(this.state.images[newCurrentImageNumber]);
+    clearInterval(this.state.counter);
+    const counter = setInterval(this.countdown,1000);
+    const sessionSeconds = timeToSeconds(this.state.sessionTime);
+    const drawSeconds = timeToSeconds(this.state.drawTime);
     this.setState({
           currentImageNumber:newCurrentImageNumber,
-          mode:"play"});
+          sessionCountdown:sessionSeconds,
+          imageCountdown:drawSeconds,
+          mode:"play",
+          counter:counter,
+    });
+  }
+  countdown() {
+    const newSessionCountdown = this.state.sessionCountdown-1;
+    const newImageCountdown = this.state.imageCountdown-1;
+    this.setState({
+          sessionCountdown:newSessionCountdown,
+          imageCountdown:newImageCountdown,
+    });
   }
   stop(event) {
+    clearInterval(this.state.counter);
     this.setState({mode:"stop"});
   }
 
@@ -254,13 +261,29 @@ class App extends Component {
         <img className="image-box-image" src={photo.url_q} alt={photo.title} />
       </div>
     );
-    const imageUrl = this.state.images.length==0 ? "" : this.getImageUrl(this.state.currentImageNumber);
+    const imageUrl = this.state.images.length===0 ? "" : this.getImageUrl(this.state.currentImageNumber);
+    
+    // show either time settings, or the countdown
+    let drawTimeSetting = {};
+    let sessionTimeSetting = {};
+    if (this.state.mode==="stop") {
+      drawTimeSetting = {"settingName":"draw time", "value":renderTime(this.state.drawTime), "onChange":this.drawTimeChange};
+      sessionTimeSetting = {"settingName":"session", "value":renderTime(this.state.sessionTime), "onChange":this.sessionTimeChange};
+    }else{
+      console.log(this.state.imageCountdown);
+      console.log(secondsToTime(this.state.imageCountdown));
+      console.log(renderTime(secondsToTime(this.state.imageCountdown)));
+      const drawTimeDisplay = renderTime(secondsToTime(this.state.imageCountdown));
+      const sessionTimeDisplay = renderTime(secondsToTime(this.state.sessionCountdown));
+      drawTimeSetting = {"settingName":"draw time", "value":drawTimeDisplay, "onChange":""};
+      sessionTimeSetting = {"settingName":"session", "value":sessionTimeDisplay, "onChange":""};
+    }
     const settings = [
-                {"settingName":"draw time", "value":renderTime(this.state.drawTime), "onChange":this.drawTimeChange},
-                {"settingName":"session", "value":renderTime(this.state.session), "onChange":this.sessionTimeChange},
+                drawTimeSetting,
+                sessionTimeSetting,
                 {"settingName":"images", "value":this.state.numberOfImages, "onChange":this.numberOfImagesChange},
     ];
-    const maybeDisplayBox = this.state.mode=="stop" ?
+    const maybeDisplayBox = this.state.mode==="stop" ?
         <SettingsBox
               className="settings-box-fake"
               settings={settings}
