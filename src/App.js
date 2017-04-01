@@ -25,32 +25,19 @@ function SettingsBox(props) {
   );
 }
 
-function previous () {
-    alert("previous");
-
-}
-
-function pause () {
-    alert("pause");
-}
-
-function skip () {
-    alert("skip");
-}
-
 function PlaybackControlBox(props) {
   return (
     <div className="playback-control-box">
-      <button onClick={previous}>
+      <button onClick={props.previous}>
         previous
       </button>
-      <button onClick={pause}>
+      <button onClick={props.pause}>
         pause
       </button>
       <button onClick={props.stop}>
         stop
       </button>
-      <button onClick={skip}>
+      <button onClick={props.skip}>
         skip
       </button>
     </div>
@@ -184,7 +171,10 @@ class App extends Component {
     this.imageCallback = this.imageCallback.bind(this);
     this.start = this.start.bind(this);
     this.countdown = this.countdown.bind(this);
+    this.previous = this.previous.bind(this);
+    this.pause = this.pause.bind(this);
     this.stop = this.stop.bind(this);
+    this.skip = this.skip.bind(this);
     this.getImageUrl = this.getImageUrl.bind(this);
   }
 
@@ -251,9 +241,26 @@ class App extends Component {
       this.stop();
     }
   }
+  previous(event) {
+    const imageTime = timeToSeconds(this.state.drawTime);
+    const offsetTime = 2*imageTime-this.state.imageCountdown;
+    const newImageCountdown = imageTime;
+    const newSessionCountdown = this.state.sessionCountdown+offsetTime;
+    const newCurrentImageNumber = this.state.currentImageNumber-1;
+    this.setState({
+          sessionCountdown:newSessionCountdown,
+          imageCountdown:newImageCountdown,
+          currentImageNumber:newCurrentImageNumber,
+    });
+  }
+  pause(event) {
+    
+  }
   stop(event) {
     clearInterval(this.state.counter);
     this.setState({mode:"stop"});
+  }
+  skip(event) {
   }
 
   getImageUrl(imageNumber) {
@@ -305,7 +312,12 @@ class App extends Component {
                 settings={settings}
           />
           <ImageDisplayBox imageUrl={imageUrl} />
-          <PlaybackControlBox stop={this.stop} />
+          <PlaybackControlBox
+              previous={this.previous}
+              pause={this.pause}
+              stop={this.stop}
+              skip={this.skip}
+          />
         </div>
     ;
     return (
