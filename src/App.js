@@ -28,7 +28,7 @@ function SettingsBox(props) {
 function PlaybackControlBox(props) {
   return (
     <div className="playback-control-box">
-      <button onClick={props.previous}>
+      <button onClick={props.previous} disabled={props.previousDisabled}>
         previous
       </button>
       <button onClick={props.playOrPauseCallback}>
@@ -230,7 +230,7 @@ class App extends Component {
     let newImageCountdown = this.state.imageCountdown-1;
     let newSessionCountdown = this.state.sessionCountdown-1;
     let newCurrentImageNumber = this.state.currentImageNumber;
-    if (newImageCountdown === 0) {
+    if (newImageCountdown < 1) {
       newImageCountdown = timeToSeconds(this.state.drawTime);
       newCurrentImageNumber++;
     } 
@@ -239,7 +239,7 @@ class App extends Component {
           imageCountdown:newImageCountdown,
           currentImageNumber:newCurrentImageNumber,
     });
-    if (newSessionCountdown === 0) {
+    if (newSessionCountdown < 1) {
       this.stop();
     }
   }
@@ -282,6 +282,9 @@ class App extends Component {
           imageCountdown:newImageCountdown,
           currentImageNumber:newCurrentImageNumber,
     });
+    if (newSessionCountdown<1){
+      this.stop()
+    }
   }
 
   getImageUrl(imageNumber) {
@@ -318,6 +321,8 @@ class App extends Component {
                 sessionTimeSetting,
                 {"settingName":"images", "value":this.state.numberOfImages, "onChange":this.numberOfImagesChange},
     ];
+    const previousDisabled = this.state.currentImageNumber===0 ? true : false;
+    const previousCallback = this.state.currentImageNumber===0 ? "" : this.previous;
     const playOrPauseCallback = this.state.playOrPause==="pause" ? this.pause : this.play;
     const maybeDisplayBox = this.state.mode==="stop" ?
         <SettingsBox
@@ -332,7 +337,8 @@ class App extends Component {
           />
           <ImageDisplayBox imageUrl={imageUrl} />
           <PlaybackControlBox
-              previous={this.previous}
+              previous={previousCallback}
+              previousDisabled={previousDisabled}
               playOrPause={this.state.playOrPause}
               playOrPauseCallback={playOrPauseCallback}
               stop={this.stop}
