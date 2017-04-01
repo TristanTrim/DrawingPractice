@@ -216,7 +216,10 @@ class App extends Component {
 
     const images = json.photos.photo;
 
-    this.setState({images:images});
+    this.setState({
+          images:images,
+          currentImageNumber:0,
+    });
   }
 
   start(event) {
@@ -244,6 +247,9 @@ class App extends Component {
           imageCountdown:newImageCountdown,
           currentImageNumber:newCurrentImageNumber,
     });
+    if (newSessionCountdown === 0) {
+      this.stop();
+    }
   }
   stop(event) {
     clearInterval(this.state.counter);
