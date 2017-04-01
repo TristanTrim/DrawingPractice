@@ -220,13 +220,11 @@ class App extends Component {
   }
 
   start(event) {
-    const newCurrentImageNumber = this.state.currentImageNumber+1;
     clearInterval(this.state.counter);
     const counter = setInterval(this.countdown,1000);
     const sessionSeconds = timeToSeconds(this.state.sessionTime);
     const drawSeconds = timeToSeconds(this.state.drawTime);
     this.setState({
-          currentImageNumber:newCurrentImageNumber,
           sessionCountdown:sessionSeconds,
           imageCountdown:drawSeconds,
           mode:"play",
@@ -234,11 +232,17 @@ class App extends Component {
     });
   }
   countdown() {
-    const newSessionCountdown = this.state.sessionCountdown-1;
-    const newImageCountdown = this.state.imageCountdown-1;
+    let newImageCountdown = this.state.imageCountdown-1;
+    let newSessionCountdown = this.state.sessionCountdown-1;
+    let newCurrentImageNumber = this.state.currentImageNumber;
+    if (newImageCountdown === 0) {
+      newImageCountdown = timeToSeconds(this.state.drawTime);
+      newCurrentImageNumber++;
+    } 
     this.setState({
           sessionCountdown:newSessionCountdown,
           imageCountdown:newImageCountdown,
+          currentImageNumber:newCurrentImageNumber,
     });
   }
   stop(event) {
