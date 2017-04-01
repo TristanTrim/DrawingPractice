@@ -31,8 +31,8 @@ function PlaybackControlBox(props) {
       <button onClick={props.previous}>
         previous
       </button>
-      <button onClick={props.pause}>
-        pause
+      <button onClick={props.playOrPauseCallback}>
+        {props.playOrPause}
       </button>
       <button onClick={props.stop}>
         stop
@@ -164,6 +164,7 @@ class App extends Component {
           mode:"stop",
           images:[],
           currentImageNumber:0,
+          playOrPause:"pause",
     };
     this.drawTimeChange = this.drawTimeChange.bind(this);
     this.sessionTimeChange = this.sessionTimeChange.bind(this);
@@ -172,6 +173,7 @@ class App extends Component {
     this.start = this.start.bind(this);
     this.countdown = this.countdown.bind(this);
     this.previous = this.previous.bind(this);
+    this.play = this.play.bind(this);
     this.pause = this.pause.bind(this);
     this.stop = this.stop.bind(this);
     this.skip = this.skip.bind(this);
@@ -253,14 +255,33 @@ class App extends Component {
           currentImageNumber:newCurrentImageNumber,
     });
   }
+  play(event) {
+    const counter = setInterval(this.countdown, 1000);
+    this.setState({
+          playOrPause:"pause",
+          counter:counter,
+    });
+  }
   pause(event) {
-    
+    clearInterval(this.state.counter);
+    this.setState({
+          playOrPause:"play",
+    });
   }
   stop(event) {
     clearInterval(this.state.counter);
     this.setState({mode:"stop"});
   }
   skip(event) {
+    const newImageCountdown = timeToSeconds(this.state.drawTime);
+    const offsetTime = this.state.imageCountdown;
+    const newSessionCountdown = this.state.sessionCountdown-offsetTime;
+    const newCurrentImageNumber = this.state.currentImageNumber+1;
+    this.setState({
+          sessionCountdown:newSessionCountdown,
+          imageCountdown:newImageCountdown,
+          currentImageNumber:newCurrentImageNumber,
+    });
   }
 
   getImageUrl(imageNumber) {
@@ -287,9 +308,6 @@ class App extends Component {
       drawTimeSetting = {"settingName":"draw time", "value":renderTime(this.state.drawTime), "onChange":this.drawTimeChange};
       sessionTimeSetting = {"settingName":"session", "value":renderTime(this.state.sessionTime), "onChange":this.sessionTimeChange};
     }else{
-      console.log(this.state.imageCountdown);
-      console.log(secondsToTime(this.state.imageCountdown));
-      console.log(renderTime(secondsToTime(this.state.imageCountdown)));
       const drawTimeDisplay = renderTime(secondsToTime(this.state.imageCountdown));
       const sessionTimeDisplay = renderTime(secondsToTime(this.state.sessionCountdown));
       drawTimeSetting = {"settingName":"draw time", "value":drawTimeDisplay, "onChange":""};
@@ -300,6 +318,7 @@ class App extends Component {
                 sessionTimeSetting,
                 {"settingName":"images", "value":this.state.numberOfImages, "onChange":this.numberOfImagesChange},
     ];
+    const playOrPauseCallback = this.state.playOrPause==="pause" ? this.pause : this.play;
     const maybeDisplayBox = this.state.mode==="stop" ?
         <SettingsBox
               className="settings-box-fake"
@@ -314,7 +333,8 @@ class App extends Component {
           <ImageDisplayBox imageUrl={imageUrl} />
           <PlaybackControlBox
               previous={this.previous}
-              pause={this.pause}
+              playOrPause={this.state.playOrPause}
+              playOrPauseCallback={playOrPauseCallback}
               stop={this.stop}
               skip={this.skip}
           />
