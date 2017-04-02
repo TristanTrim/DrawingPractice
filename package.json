@@ -18,5 +18,5 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
   },
-  "homepage": "http://TristanTrim.github.io/DrawingPractice"
+  "homepage": "https://TristanTrim.github.io/DrawingPractice"
 }
