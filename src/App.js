@@ -215,16 +215,18 @@ class App extends Component {
   }
 
   start(event) {
-    clearInterval(this.state.counter);
-    const counter = setInterval(this.countdown,1000);
-    const sessionSeconds = timeToSeconds(this.state.sessionTime);
-    const drawSeconds = timeToSeconds(this.state.drawTime);
-    this.setState({
-          sessionCountdown:sessionSeconds,
-          imageCountdown:drawSeconds,
-          mode:"play",
-          counter:counter,
-    });
+    if (this.state.images.length>0) {
+      clearInterval(this.state.counter);
+      const counter = setInterval(this.countdown,1000);
+      const sessionSeconds = timeToSeconds(this.state.sessionTime);
+      const drawSeconds = timeToSeconds(this.state.drawTime);
+      this.setState({
+            sessionCountdown:sessionSeconds,
+            imageCountdown:drawSeconds,
+            mode:"play",
+            counter:counter,
+      });
+    }
   }
   countdown() {
     let newImageCountdown = this.state.imageCountdown-1;
