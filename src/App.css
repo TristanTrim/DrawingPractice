@@ -12,7 +12,7 @@ body {
 }
 input.setting-box {
   color: #222;
-  width:8em;
+  width:4em;
 }
 
 .settings-box-real {
@@ -23,17 +23,22 @@ input.setting-box {
   left: 0;
   width: 100%;
   padding: .6em;
+  padding-left: 0;
+  padding-right: 0;
+  margin:0;
   background-color: #222;
 }
 .settings-box-fake{
+  overflow:hidden;
   display:flex;
   justify-content:center;
   width: 100%;
   padding: .6em;
+  padding-left: 0;
+  padding-right: 0;
   padding-top: .1em;
   padding-bottom: .1em;
-  margin-left:0;
-  margin-bottom:0;
+  margin:0;
   background-color: #222;
 }
 
@@ -41,11 +46,13 @@ input.setting-box {
   display:flex;
   flex-direction:column;
   height: 99vh;
-  width: 100vw;
+  width: 97vw;
+  margin:auto;
 }
 
 .image-display-box {
   height:100%;
+  margin:0;
   flex-grow:1;
   background-size:contain;
   background-repeat:no-repeat;
@@ -55,6 +62,7 @@ input.setting-box {
 .playback-control-box {
   float:left;
   width:100%;
+  margin:0;
 }
 .search-box {
   background-color: #bbb;
