@@ -176,6 +176,7 @@ class App extends Component {
     this.play = this.play.bind(this);
     this.pause = this.pause.bind(this);
     this.stop = this.stop.bind(this);
+    this.stopCallback = this.stopCallback.bind(this);
     this.skip = this.skip.bind(this);
     this.getImageUrl = this.getImageUrl.bind(this);
   }
@@ -226,6 +227,9 @@ class App extends Component {
             mode:"play",
             counter:counter,
       });
+      setTimeout(
+              function(){document.getElementById('display-box').classList.toggle('closed');},
+              10);
     }
   }
   countdown() {
@@ -271,7 +275,13 @@ class App extends Component {
     });
   }
   stop(event) {
+    document.getElementById('display-box').classList.toggle('closed');
     clearInterval(this.state.counter);
+    setTimeout(
+            this.stopCallback,
+              600);
+  }
+  stopCallback() {
     this.setState({mode:"stop"});
   }
   skip(event) {
@@ -332,7 +342,7 @@ class App extends Component {
               settings={settings}
         />
       :
-        <div className="display-box">
+        <div id="display-box" className="display-box closed">
           <SettingsBox
                 className="settings-box-fake"
                 settings={settings}

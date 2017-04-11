@@ -48,6 +48,13 @@ input.setting-box {
   height: 99vh;
   width: 97vw;
   margin:auto;
+
+  overflow-y: hidden;
+  transition-property: all;
+  transition-duration: 1s;
+}
+.display-box.closed {
+  height: 0;
 }
 
 .image-display-box {
