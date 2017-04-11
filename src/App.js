@@ -28,16 +28,16 @@ function SettingsBox(props) {
 function PlaybackControlBox(props) {
   return (
     <div className="playback-control-box">
-      <button onClick={props.previous} disabled={props.previousDisabled}>
+      <button className="button" onClick={props.previous} disabled={props.previousDisabled}>
         previous
       </button>
-      <button onClick={props.playOrPauseCallback}>
+      <button className="button" onClick={props.playOrPauseCallback}>
         {props.playOrPause}
       </button>
-      <button onClick={props.stop}>
+      <button className="button" onClick={props.stop}>
         stop
       </button>
-      <button onClick={props.skip}>
+      <button className="button" onClick={props.skip}>
         skip
       </button>
     </div>
@@ -95,8 +95,8 @@ class SearchBox extends Component {
         <label>
           <input type="text" autoFocus="autofocus" value={this.state.value} onChange={this.handleChange} />
         </label>
-        <input type="submit" value="Search" onClick={(e)=>this.searchImages(e,this.state.value)} />
-        <input type="submit" value="Draw" onClick={this.startDrawing} />
+        <input className="button" type="submit" value="Search" onClick={(e)=>this.searchImages(e,this.state.value)} />
+        <input className="button" type="submit" value="Draw" onClick={this.startDrawing} />
       </form>
     );
   }

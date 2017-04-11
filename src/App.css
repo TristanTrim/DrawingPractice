@@ -71,6 +71,18 @@ input.setting-box {
   padding-top: .6em;
   padding-bottom: .6em;
 }
+.button {
+  background-color: #222;
+  border: none;
+  padding: .25em;
+  margin: .25em;
+  color: #bbb;
+  -webkit-transition-duration: 0.1s; /* Safari */
+  transition-duration: 0.1s;
+}
+.button:active {
+  background-color: #666;
+}
 
 .image-box {
   display: inline-block;
